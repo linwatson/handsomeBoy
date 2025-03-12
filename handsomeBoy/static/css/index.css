@@ -1,0 +1,101 @@
+body {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* 確保body的高度填滿整個視窗 */
+    text-align: center;
+    font-family: Arial, sans-serif;
+    margin: 0; /* 去除預設邊距 */
+    overflow: hidden;
+}
+
+
+
+
+/* 隱藏原生 input[type="file"] */
+#upload {
+    display: none;
+}
+
+/* 自訂上傳按鈕樣式 */
+.custom-file-upload ,.convertButton{
+    width: 30vw;
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    background-color: #4CAF50;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin-top: 20px;
+}
+
+/* 滑鼠懸停時的效果 */
+.custom-file-upload:hover, .convertButton:hover{
+    background-color: #45a049;
+}
+
+/* 按下按鈕時的效果 */
+.custom-file-upload:active, .convertButton:active {
+    background-color: #3e8e41;
+}
+
+
+
+
+
+.progress-container {
+    width: 80%;
+    margin: 20px auto;
+    background-color: #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    width: 0%;
+    height: 30px;
+    background-color: #4caf50;
+    text-align: center;
+    line-height: 30px;
+    color: white;
+    font-weight: bold;
+    transition: width 0.3s;
+}
+
+/* 使圖片並排顯示 */
+.image-container {
+    display: grid; /* 使用 Grid 佈局 */
+    max-width: 100vw;
+    height: 70vh; /* 確保圖片高度不會超過螢幕高度 */
+    grid-template-columns: repeat(2, 1fr); /* 設定最大兩列佈局 */
+    justify-content: center; /* 使圖片水平居中 */
+    align-items: center; /* 垂直居中圖片 */
+    gap: 20px; /* 圖片間距 */
+    margin-top: 20px;
+    /* background-color: gray; */
+}
+
+.image-wrapper {
+    border: black solid 5px;
+    height: 70vh;
+}
+
+img {
+    max-width: 50vw;  /* 確保圖片寬度不會超過螢幕寬度 */
+    max-height: 70vh; /* 確保圖片高度不會超過螢幕高度 */
+    min-width: 50vw;
+    display: block;  /* 防止圖片下方有多餘的空隙 */
+    object-fit: contain;  /* 確保圖片完整顯示並保持比例 */
+    
+}
+
+footer {
+    /* background-color: red; */
+    margin-top: auto; /* 使footer始終位於頁面底部 */
+    padding: 20px;
+    width: 100%;
+    text-align: center;
+}

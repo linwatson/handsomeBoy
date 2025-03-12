@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" /> -->
+    <link rel="bookmark" href="{{ url_for('static', filename='favicon.ico') }}" />
+    <title>圖片轉點陣圖</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+</head>
+<body>
+    <h1>帥哥們的圖片轉換工具</h1>
+        <div class="image-container">
+            <div class="test">
+                <div class="image-wrapper">
+                    <img id="original" style="display:none;">
+                </div>
+                <label for="upload" class="custom-file-upload">選擇圖片</label>
+                <input type="file" id="upload" accept="image/*" onchange="previewImage()">
+            </div>
+            <div class="test">
+                <div class="image-wrapper">
+                    <img id="result" style="display:none;">
+                </div>
+                <button class="convertButton" id="convertButton" onclick="uploadImage()" >轉換為點圖</button>
+            </div>
+        </div>
+
+    <footer>
+        <!-- 進度條 -->
+        <div class="progress-container">
+            <div id="progress-bar" class="progress-bar">0%</div>
+        </div>
+    </footer>
+
+    <script>
+        // 預覽選擇的圖片並清除先前轉換的圖片
+        function previewImage() {
+            // 清除先前的轉換後圖片
+            let resultImage = document.getElementById("result");
+            resultImage.style.display = "none";  // 隱藏轉換後的圖片
+            resultImage.src = "";  // 清空圖片來源
+
+            let fileInput = document.getElementById("upload");
+            let originalImage = document.getElementById("original");
+            let convertButton = document.getElementById("convertButton");
+            
+            // 顯示選擇的原始圖片
+            let file = fileInput.files[0];
+            if (file) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    originalImage.src = e.target.result;
+                    originalImage.style.display = "block";
+                    convertButton.style.display = "inline-block";  // 顯示轉換按鈕
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // 上傳並轉換圖片
+        function uploadImage() {
+            let fileInput = document.getElementById("upload");
+            if (!fileInput.files.length) {
+                alert("請選擇一張圖片！");
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            fetch("/upload", { method: "POST", body: formData })
+            .then(response => response.json())
+            .then(data => {
+                let taskId = data.task_id;
+                let originalPath = `/uploads/${data.original}`;
+                let processedPath = `/processed/${data.processed}`;
+
+                monitorProgress(taskId, processedPath);  // 開始監控進度
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+        // 監控進度並更新進度條
+        function monitorProgress(taskId, processedPath) {
+            let eventSource = new EventSource(`/progress/${taskId}`);
+            eventSource.onmessage = function(event) {
+                let progress = parseInt(event.data);
+                updateProgressBar(progress);
+                if (progress >= 100) {
+                    eventSource.close();
+                    showProcessedImage(processedPath);  // 顯示轉換後的圖片
+                }
+            };
+        }
+
+        // 顯示轉換後的圖片
+        function showProcessedImage(processedPath) {
+            let resultImage = document.getElementById("result");
+            resultImage.src = processedPath;
+            resultImage.style.display = "block";  // 顯示轉換後的圖片
+        }
+
+        // 更新進度條
+        function updateProgressBar(value) {
+            let progressBar = document.getElementById("progress-bar");
+            progressBar.style.width = value + "%";
+            progressBar.textContent = value + "%";
+        }
+    </script>
+</body>
+</html>
